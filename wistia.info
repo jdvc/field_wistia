@@ -1,0 +1,7 @@
+name = Field Wistia
+description = Provides an Wistia widget for fields. 
+package = Fields
+core = 7.x
+dependencies[] = field 
+dependencies[] = image
+dependencies[] = file

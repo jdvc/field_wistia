@@ -1,0 +1,476 @@
+<?php
+
+/**
+ * @file
+ * Wistia field module adds a field for Wistia videos.
+ */
+
+define('MEDIA_WISTIA_DEFAULT_GETEMBED_URL', 'http://get-embed.wistia.com/oembed.json');
+define('MEDIA_WISTIA_DEFAULT_API_URL', 'https://api.wistia.com/v1/');
+define('MEDIA_WISTIA_DEFAULT_OEMBED_URL', 'http://fast.wistia.com/oembed');
+define('MEDIA_WISTIA_PUBLIC_EMBED_URL', 'http://fast.wistia.net/embed/medias/');
+
+require_once (dirname(__FILE__) . '/wistia.inc');
+ 
+/**
+ * Implements hook_menu().
+ */
+function wistia_menu() {
+  $items['admin/config/media/wistia'] = array(
+    'title' => 'Wistia settings', 
+    'description' => 'Configure sitewide settings for embedded Wistia video fields.',    
+    'page callback' => 'drupal_get_form', 
+    'page arguments' => array('wistia_settings_form'),
+    'access arguments' => array('administer wistia'), 
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function wistia_permission() {
+  return array(
+    'administer wistia' => array(
+      'title' => t('Administer Wistia field'), 
+      'description' => t('Set default configurations for Wistia field settings.'),
+    ),
+  );
+}
+
+/**
+ * Settings form for Wistia field module.
+ * Sets the default settings and variables for the field globally
+ * Can be overriden on and individual field basis
+ */
+function wistia_settings_form($form) {
+  $form = array();
+  $form['text'] = array(
+    '#type' => 'markup',
+    '#markup' => '<p>' . t('The following settings will be used as default values 
+      on all Wistia video fields.  Many of these settings can be overridden
+      on a per-field basis.') . '</p>',
+  );
+  $form['wistia_embed'] = array(
+    '#type' => 'radios',
+    '#title' => t('Choose your preferred embed type'),
+    '#options' => array(
+      'api' => 'api', 
+      'seo' => 'SEO', 
+      'iframe' => 'iframe'
+    ),
+    '#default_value' => variable_get('wistia_embed', FALSE),
+  );
+  $form['wistia_videofoam'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Scale video window to device with VideoFoam'),
+    '#default_value' => variable_get('wistia_videofoam', TRUE),
+    /* '#description' => t('<a target=_blank href="@url">VideoFoam</a> info', array('@url' => ('admin'))), */
+  );
+  $form['wistia_autoplay'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Wisita autoplay'),
+    '#default_value' => variable_get('wistia_autoplay', TRUE),
+  );
+  $form['wistia_thumb_dir'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Wistia thumbnail directory'),
+    '#field_prefix' => variable_get('file_public_path', conf_path() . '/files') . '/',
+    '#field_suffix' => '/thumbnail.png',
+    '#description' => t('Location, within the files directory, where you would like the Wistia thumbnails stored.'),
+    '#default_value' => variable_get('wistia_thumb_dir', 'wistia'),
+  );
+
+  return system_settings_form($form);
+}
+
+/**
+ * Implements hook_field_info().
+ * Names the field that this module will create
+ */
+function wistia_field_info() {
+  return array(
+    // We name our field as the associative name of the array.
+    'wistia' => array(
+      'label' => t('Wistia video'),
+      'description' => t('A video hosted on Wistia.'),
+      'default_widget' => 'wistia',
+      'default_formatter' => 'wistia_video',
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_validate().
+ */
+function wistia_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {
+  foreach ($items as $delta => $item) {
+    if (!empty($item['input'])) {
+
+      $video_id = wistia_get_video_id($item['input']);
+
+      if (!$video_id) {
+        $errors[$field['field_name']][$langcode][$delta][] = array(
+          'error' => 'wistia_invalid',
+          'message' => t('Please provide a valid Wistia URL.'),
+        );
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_field_is_empty().
+ */
+function wistia_field_is_empty($item, $field) {
+  return empty($item['input']);
+}
+
+/**
+ * Implements hook_field_formatter_info().
+ * This tells Drupal what fields it applies to and what settings are available.
+ */
+function wistia_field_formatter_info() {
+  $formatters =  array(
+    // This formatter displays a wistia video.
+    'wistia_video' => array(
+      'label' => t('Wistia video'),
+      'field types' => array('wistia'),
+      'settings' => array(
+        'wistia_size' => '420x315',
+        'wistia_width' => NULL,
+        'wistia_height' => NULL,
+        'wistia_autoplay' => FALSE,
+        'wistia_videofoam' => FALSE,
+        'wistia_ssl' => FALSE,
+      ),
+    ),
+    // This formatter just displays a thumbnail for your video.
+    'wistia_thumbnail' => array(
+      'label' => t('Wistia thumbnail'),
+      'field types' => array('wistia'),
+      'settings' => array(
+        'image_style' => 'thumbnail',
+        'image_link' => '',
+      ),
+    ),
+  );
+
+  return $formatters;
+}
+
+/**
+ * Implements hook_field_formatter_settings_form().
+ * Here we'll tell Drupal how to generate the form that collects the options.
+ */
+function wistia_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+
+  if ($display['type'] == 'wistia_video') {
+    $element['wistia_size'] = array(
+      '#type' => 'select',
+      '#title' => t('Wistia video size'),
+      '#options' => wistia_size_options(),
+      '#default_value' => $settings['wistia_size'],
+    );
+    $element['wistia_width'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Width'),
+      '#size' => 10,
+      '#default_value' => $settings['wistia_width'],
+      '#states' => array(
+        'visible' => array(
+          ':input[name="fields[' . $field['field_name'] . '][settings_edit_form][settings][wistia_size]"]' => array('value' => 'custom'),
+        ),
+      ),
+    );
+    $element['wistia_height'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Height'),
+      '#size' => 10,
+      '#default_value' => $settings['wisita_height'],
+      '#states' => array(
+        'visible' => array(
+          ':input[name="fields[' . $field['field_name'] . '][settings_edit_form][settings][wistia_size]"]' => array('value' => 'custom'),
+        ),
+      ),
+    );
+    $element['wistia_autoplay'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Play video automatically when loaded (Autoplay).'),
+      '#default_value' => $settings['wistia_autoplay'],
+    );
+    $element['wistia_videofoam'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('VideoFoam allows the player to scale with the browser window.'),
+      '#default_value' => $settings['wistia_videofoam'],
+    );
+    $element['wistia_embed'] = array(
+      '#type' => 'select',
+      '#title' => t('Choose the wistia embed type for this field'),
+      '#options' => array(
+        'api' => 'API', 
+        'seo' => 'SEO', 
+        'iframe' => 'iframe'
+      ),
+      '#default_value' => $settings['wistia_embed'],
+    );
+  }
+
+  // Thumbnail type
+  if ($display['type'] == 'wistia_thumbnail') {
+    $element['image_style'] = array(
+      '#type' => 'select',
+      '#title' => t('Image style'),
+      '#options' => image_style_options(FALSE),
+      '#default_value' => $settings['image_style'],
+      '#empty_option' => t('None (original image)'),
+    );
+
+    // Option to link the thumbnail to either it's original node or original youtube video.
+    //@TODO Probably Don't Need This
+    $link_types = array(
+      'content' => t('Content'),
+      'wistia' => t('Wistia'),
+    );
+    $element['image_link'] = array(
+      '#title' => t('Link image to'),
+      '#type' => 'select',
+      '#default_value' => $settings['image_link'],
+      '#empty_option' => t('Nothing'),
+      '#options' => $link_types,
+    );
+  }
+  dpm($form);
+  return $element;
+}
+
+/**
+ * Implements hook_field_formatter_settings_summary().
+ * This displays the chosen settings on the 'Manage Display' page
+ */
+function wistia_field_formatter_settings_summary($field, $instance, $view_mode) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+
+  // Summary for the video style.
+  $parameters = array(
+    $settings['wistia_embed'],
+    $settings['wistia_autoplay'],
+    $settings['wistia_videofoam'],
+    $settings['wistia_ssl'],
+  );
+
+  // Summary for the video style.
+  if ($display['type'] == 'wistia_video') {
+    $video_sizes = wistia_size_options();
+    if (isset($video_sizes[$settings['wistia_size']])) {
+      $summary = t('Wistia video: @size', array('@size' => $video_sizes[$settings['wistia_size']]));
+    }
+    else {
+      $summary = t('Wistia video: 450px by 315px');
+    }
+    foreach ($parameters as $parameter) {
+      if ($parameter) {
+        $summary .= t(', custom parameters');
+        break;
+      }
+    }
+    return $summary;
+  }
+
+  // Summary for the thumbnail style.
+  if ($display['type'] == 'wistia_thumbnail') {
+    $image_styles = image_style_options(FALSE);
+    // Unset possible 'No defined styles' option.
+    unset($image_styles['']);
+    if (isset($image_styles[$settings['image_style']])) {
+      $summary = t('Image style: @style', array('@style' => $image_styles[$settings['image_style']]));
+    }
+    else {
+      $summary = t('Original image');
+    }
+    $link_types = array(
+      'content' => ' ' . t('linked to content'),
+      'wistia' => ' ' . t('linked to Wistia'),
+    );
+    // Display this setting only if image is linked.
+    if (isset($settings['image_link']) && isset($link_types[$settings['image_link']])) {
+      $summary .= $link_types[$settings['image_link']];
+    }
+    return $summary;
+  }
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ * This is the hook where we actually do the formatting
+ */
+function wistia_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+  $settings = $display['settings'];
+
+  switch ($display['type']) {
+    case 'wistia_video':
+      foreach ($items as $delta => $item) {
+        $element[$delta] = array(
+          //setting the theme hoook name, gets used as THEME_wistia_video
+          //to add the actual markup
+          '#theme' => 'wistia_video',
+          '#video_id' => $item['video_id'],
+          '#size' => array_key_exists('wistia_size', $settings) ? $settings['wistia_size']: NULL,
+          '#width' => array_key_exists('wistia_width', $settings) ? $settings['wistia_width'] : NULL,
+          '#height' => array_key_exists('wistia_height', $settings) ? $settings['wistia_height'] : NULL,
+          '#embed' => array_key_exists('wistia_embed', $settings) ? $settings['wistia_embed'] : NULL,
+          '#autoplay' => array_key_exists('wistia_autoplay', $settings) ? $settings['wistia_autoplay'] : FALSE,
+          '#videofoam' => array_key_exists('wistia_videofoam', $settings) ? $settings['wistia_videofoam']: FALSE,
+          '#ssl' => array_key_exists('wistia_ssl', $settings) ? $settings['wistia_ssl']: FALSE,
+        );
+      }
+      dpm($display);
+      break;
+
+    // This formatter uses an imagecache preset to generate a thumbnail.
+    case 'wistia_thumbnail':
+
+      // Check if the formatter involves a link.
+      if (isset($display['settings']['image_link'])) {
+        if ($display['settings']['image_link'] == 'content') {
+          $uri = entity_uri($entity_type, $entity);
+          $uri['options']['html'] = TRUE;
+        }
+        elseif ($display['settings']['image_link'] == 'wistia') {
+          $link_wistia = TRUE;
+        }
+      }
+
+      //@TODO where i stopped, just after getting the image display stuff worked out
+      foreach ($items as $delta => $item) {
+        // If the thumbnail is linked to it's wistia page, take the original url.
+        if (isset($link_wistia) && $link_wistia) {
+          $uri = array(
+            'path' => $item['input'],
+            'options' => array('html' => TRUE),
+          );
+        }
+
+        $element[$delta] = array(
+          '#theme' => 'wistia_thumbnail',
+          '#video_id' => $item['video_id'],
+          '#image_style' => $display['settings']['image_style'],
+          '#image_link' => isset($uri) ? $uri : '',
+        );
+      }
+      break;
+  }
+
+  return $element;
+}
+
+/**
+ * Implements hook_field_widget_info().
+ */
+function wistia_field_widget_info() {
+  return array(
+    'wistia' => array(
+      'label' => t('Wistia'),
+      'field types' => array('wistia'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_widget_form().
+ * shows up on node form as the field widget that is getting filled out
+ */
+function wistia_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+  $value = isset($items[$delta]['input']) ? $items[$delta]['input'] : '';
+
+  $element += array(
+    '#type' => 'textfield',
+    '#default_value' => $value,
+    '#size' => 60,
+    '#maxlength' => 1024,
+    '#element_validate' => array('wistia_input_validate'),
+    //'#value_callback' => 'wistia_widget_value',
+  );
+
+  // Add our own description if one is not provided by the UI.
+  // i.e. somone doens't make their own
+  if ($element['#description'] == '') {
+    $element['#description'] = t('Enter the Wistia URL. Valid URL formats include: http://www.wistia.com/medias/g5pnf59ala');
+  }
+  $return = array('input' => $element);
+
+  //this shows up below the field on the node edit page if there is no custom message set.
+  if (isset($items[$delta]['video_id'])) {
+    $video_id_element = array(
+      '#markup' => '<div class="wistia-video-id">' . t('Wistia video ID: ') . $items[$delta]['video_id'] . '</div>',
+    );
+    $return['video_id'] = $video_id_element;
+  }
+
+  return $return;
+}
+
+/**
+ * Validation for the wistia field itself.
+ */
+function wistia_input_validate($element, &$form_state, $form) {
+  $input = $element['#value'];
+
+  $video_id = wistia_get_video_id($input);
+
+  if ($video_id) {
+    $video_id_element = array(
+      '#parents' => $element['#parents'],
+    );
+    array_pop($video_id_element['#parents']);
+    $video_id_element['#parents'][] = 'video_id';
+    form_set_value($video_id_element, $video_id, $form_state);
+  }
+}
+
+/**
+ * Implements hook_field_widget_error().
+ * tells Drupal how to handle errors detected in hook_field_widget_error()
+ */
+function wistia_field_widget_error($element, $error, $form, &$form_state) {
+  switch ($error['error']) {
+    case 'wistia_invalid':
+      form_error($element, $error['message']);
+      break;
+  }
+}
+
+/**
+ * Implements of hook_theme().
+ */
+function wistia_theme($existing, $type, $theme, $path) {
+  return array(
+    'wistia_thumbnail' => array(
+      'variables' => array(
+        'video_id' => NULL,
+        'image_style' => NULL, 
+        'image_link' => NULL
+      ),
+      'file' => 'wistia.theme.inc',
+    ),
+    'wistia_video' => array(
+      'variables' => array(
+        'video_id' => NULL, 
+        'size' => NULL, 
+        'width' => NULL, 
+        'height' => NULL, 
+        'embed' => NULL,
+        'autoplay' => FALSE,
+        'videofoam' => FALSE,
+        'ssl' => FALSE,
+      ),
+      'file' => 'wistia.theme.inc',
+    ),
+  );
+}

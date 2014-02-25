@@ -1,0 +1,42 @@
+<?php
+/**
+ * @file
+ * Install, update, and uninstall functions for the wistia module.
+ */
+
+/**
+ * Implements hook_field_schema().
+ */
+function wistia_field_schema($field) {
+  $columns = array(
+    'input' => array(
+      'type' => 'varchar', 
+      'length' => 1024, 
+      'not null' => FALSE,
+    ),
+    'video_id' => array(
+      'type' => 'varchar', 
+      'length' => 15, 
+      'not null' => FALSE,
+    ),
+  );
+  $indexes = array(
+    'video_id' => array('video_id'),
+  );
+  return array(
+    'columns' => $columns,
+    'indexes' => $indexes,
+  );
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function wistia_uninstall() {
+  // Delete youtube variables when module is removed.
+  variable_del('wistia_embed');
+  variable_del('wistia_videofoam');
+  variable_del('wistia_ssl');
+  variable_del('wistia_autoplay');
+  variable_del('wistia_thumb_dir');
+}

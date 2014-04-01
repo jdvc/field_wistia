@@ -15,17 +15,18 @@
  * Decare new theme_hook function for wistia videos embeds
  * why use array_key_exits?
  */
-function theme_wistia_video($variables) {
+function theme_field_wistia_video($variables) {
   $id = $variables['video_id'];
   $size = $variables['size'];
 
   $version = '1.0';
   $height = array_key_exists('height', $variables) ? $variables['height'] : NULL;
   $width =  array_key_exists('width', $variables) ? $variables['width'] : NULL;
-  $embedtype = array_key_exists('embed', $variables) ? $variables['embed'] : NULL;
+  $embedtype = array_key_exists('embed', $variables) ? $variables['embed'] : FALSE;
   $autoplay = array_key_exists('autoplay', $variables) ? $variables['autoplay'] : FALSE;
   $videofoam = array_key_exists('videofoam', $variables) ? $variables['videofoam'] : FALSE;
   $ssl = array_key_exists('ssl', $variables) ? $variables['ssl'] : FALSE;
+  $plugin = array_key_exists('plugin', $variables) ? $variables['plugin'] : FALSE;
 
   // Query Strings based on settings
   $query = array();
@@ -33,10 +34,10 @@ function theme_wistia_video($variables) {
     $query['height'] = $height;
   }
   if ($width) {
-    $query['width'] = $height;
+    $query['width'] = $width;
   }
   if ($embedtype) {
-    $query['embedType'] = $embedtype;
+    $query['embedType'] = 'api';
   }
   if ($autoplay) {
     $query['autoPlay'] = 'true';
@@ -47,23 +48,25 @@ function theme_wistia_video($variables) {
   if ($ssl) {
     $query['ssl'] = 'true';
   }
+  if ($plugin) {
+    $query['plugin']['socialbar-v1']['buttons'] = 'twitter-facebook-reddit';
+  }
 
   /* http_build_query Parses an array into a valid, rawurlencoded query string. */
-  $url = MEDIA_WISTIA_PUBLIC_EMBED_URL . $id . '?' . http_build_query($query);
+  $url = field_wistia_PUBLIC_EMBED_URL . $id . '?' . http_build_query($query);
 
   $params = array('url' => $url);
 
   /* this sends the oembed request to wistia and gets a json array in return
    * The html key in the array holds renderable markup  
    */
-  $embed = _media_wistia_request_embed($params);
+  $embed = _media_field_wistia_request_embed($params);
 
+  dpm($embed);
   // Build the oembed URL with options query strings
   $output = $embed['html'];
 
   return $output;
-  dpm($output);
-  dpm($query);
 }
 
 /**
@@ -73,12 +76,10 @@ function theme_wistia_video($variables) {
  * @param $query array the quiery string to send to the endpoint.
  * @return array|bool
  */
-function _media_wistia_request_embed($query) {
+function _media_field_wistia_request_embed($query) {
   // Make HTTP request.
-  $endpoint = variable_get('media_wistia_getembed_url', MEDIA_WISTIA_DEFAULT_GETEMBED_URL);
+  $endpoint = variable_get('field_wistia_getembed_url', FIELD_WISTIA_DEFAULT_GETEMBED_URL);
   $result = drupal_http_request(url($endpoint, array('query' => $query)));
-
-  dpm($result);
 
   if ($data = json_decode($result->data)) {
     // Success.
@@ -89,4 +90,48 @@ function _media_wistia_request_embed($query) {
     // was an error with the request.
     return FALSE;
   }
+}
+
+/**
+ * Theme function for thumbnails.
+ */
+function theme_field_wistia_thumbnail($variables) {
+  $id = $variables['video_id'];
+  $style = $variables['image_style'];
+
+  // Get Wistia settings - TODO is this needed?
+  $size = variable_get('field_wistia_size', '420x315');
+  $dimensions = field_wistia_get_dimensions($size);
+
+  $files = variable_get('file_public_path', conf_path() . '/files');
+  $wistia = variable_get('field_wistia_thumb_dir', 'wistia');
+  $dest = $files . '/' . $wistia . '/' . $id . '.png';
+
+  // Check to see if a thumbnail exists locally.
+  if (!file_exists($dest)) {
+    // Retrieve the image from Wistia.
+    if (!field_wistia_get_remote_image($id)) {
+      // Use the remote source if local copy fails.
+      $src = field_wistia_build_remote_image_path($id);
+      return theme('image', array('path' => $src));
+    }
+  }
+
+  if ($style) {
+    $uri = 'public://' . $wistia . '/' . $id . '.png';
+    $image = theme('image_style', array('style_name' => $style, 'path' => $uri));
+  }
+  else {
+    $path = $files . '/' . $wistia . '/' . $id . '.png';
+    $image = theme('image', array('path' => $path));
+  }
+
+  // Check if an url path is provided
+  if ($variables['image_link'] != NULL) {
+    $url_path = $variables['image_link']['path'];
+    $options = $variables['image_link']['options'];
+    $image = l($image, $url_path, $options);
+  }
+
+  return $image;
 }

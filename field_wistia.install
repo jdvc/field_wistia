@@ -7,7 +7,7 @@
 /**
  * Implements hook_field_schema().
  */
-function wistia_field_schema($field) {
+function field_wistia_field_schema($field) {
   $columns = array(
     'input' => array(
       'type' => 'varchar', 
@@ -32,11 +32,11 @@ function wistia_field_schema($field) {
 /**
  * Implements hook_uninstall().
  */
-function wistia_uninstall() {
-  // Delete youtube variables when module is removed.
-  variable_del('wistia_embed');
-  variable_del('wistia_videofoam');
-  variable_del('wistia_ssl');
-  variable_del('wistia_autoplay');
-  variable_del('wistia_thumb_dir');
+function field_wistia_uninstall() {
+  // Delete wistia variables when module is removed.
+  variable_del('field_wistia_embed');
+  variable_del('field_wistia_videofoam');
+  variable_del('field_wistia_ssl');
+  variable_del('field_wistia_autoplay');
+  variable_del('field_wistia_thumb_dir');
 }

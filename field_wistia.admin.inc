@@ -1,6 +1,7 @@
 <?php
 
 /**
+ * @file
  * Settings form for Wistia field module.
  *
  * Sets the default settings and variables for the field globally

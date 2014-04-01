@@ -17,7 +17,7 @@ function field_wistia_size_options() {
   );
 }
 
-/*
+/**
  * Regex provided from Wistia docs to parse their URLs
  */
 function field_wistia_get_video_id($input) {

@@ -2,13 +2,13 @@
 
 /**
  * @ file
- * Wistia field helper functions.
+ * Field Wistia helper functions.
  */
 
 /**
  * Returns a list of standard Wistia video sizes.
  */
-function field_wistia_field_size_options() {
+function field_wistia_size_options() {
   return array(
     '480x360' => '480px by 360px (4:3)',
     '640x360' => '640px by 360px (16:9)',
@@ -22,7 +22,7 @@ function field_wistia_field_size_options() {
  * their URLs
  */
 
-function field_wistia_field_get_video_id($input) {
+function field_wistia_get_video_id($input) {
   $patterns = array(
     '/https?:\/\/(.+)?(wistia\.com|wi\.st)\/(medias|embed)\/(.*)/',
     '/https?:\/\/(.+)?(wistia\.net|wi\.st)\/(medias|embed)\/.*\/([^"]+)/',
@@ -41,7 +41,7 @@ function field_wistia_field_get_video_id($input) {
 /**
  * Splits height and width when given size, as from field_wistia_size_options.
  */
-function field_wistia_field_get_dimensions($size = NULL, $width = NULL, $height = NULL) {
+function field_wistia_get_dimensions($size = NULL, $width = NULL, $height = NULL) {
   $dimensions = array();
   if ($size == 'custom') {
     $dimensions['width'] = (int) $width;
@@ -64,39 +64,30 @@ function field_wistia_field_get_dimensions($size = NULL, $width = NULL, $height 
  *
  * TODO add error messaging if something goes wrong, and return FALSE.
  */
-function field_wistia_field_get_remote_image($id = NULL) {
-  $url = FIELD_WISTIA_FIELD_PUBLIC_EMBED_URL . $id;
+function field_wistia_get_remote_image($id = NULL) {
+  $url = FIELD_WISTIA_PUBLIC_EMBED_URL . $id;
 
   $params = array('url' => $url);
-  $embed = _media_field_wistia_request_embed($params);
+  $embed = _field_wistia_request_embed($params);
 
-  $image_result = $embed['thumbnail_url'];
-  dpm($image_result);
+  $src = $embed['thumbnail_url']; 
+
+  // Make the actual request to download the file.
+  $image_result = drupal_http_request($src);
 
   // Assure the wistia thumbnail directory exists.
   $files = variable_get('file_public_path', conf_path() . '/files');
-  $field_wistia_dir = variable_get('field_wistia_field_thumb_dir', 'wistia');
+  $field_wistia_dir = variable_get('field_wistia_thumb_dir', 'field_wistia');
+  dpm($field_wistia_dir);
   $field_wistia_path = $files . '/' . $field_wistia_dir;
   if (!file_prepare_directory($field_wistia_path, FILE_CREATE_DIRECTORY) && !mkdir($field_wistia_path, 0775, TRUE)) {
-    watchdog('wistia', 'Failed to create Wistia thumbnail directory: %dir', array('%dir' => $field_wistia_path), WATCHDOG_ERROR);
+    watchdog('field_wistia', 'Failed to create Field Wistia thumbnail directory: %dir', array('%dir' => $field_wistia_path), WATCHDOG_ERROR);
   }
 
   // Save the file.
   $dest = $files . '/' . $field_wistia_dir . '/' . $id . '.png';
-  file_put_contents($dest, $image_result);
+  file_put_contents($dest, $image_result->data);
 
   return TRUE;
-}
 
-/**
- * Get images by building correctly formed URL - kinda hackey.
- */
-function field_wistia_field_build_remote_image_path($id = NULL) {
-  if (!$id) {
-    return;
-  }
-  // Default image thumbnail.
-  $default = 'http://img.wistia.com/vi/' . $id . '/default.jpg'; 
-
-  return url($default);
 }

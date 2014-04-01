@@ -88,9 +88,9 @@ function field_wistia_settings_form($form) {
 }
 
 /**
- * Implements hook_field_info()
+ * Implements hook_field_info().
  *
- * Names the field that this module will create
+ * Names the field that this module will create.
  */
 function field_wistia_field_info() {
   return array(
@@ -131,10 +131,10 @@ function field_wistia_field_is_empty($item, $field) {
 }
 
 /**
- * Implements hook_field_formatter_info()
+ * Implements hook_field_formatter_info().
  *
  * This tells Drupal what fields it applies to and what settings are available.
- * this is important, if you miss something here like embed, then it doesn't get passed on to theme.inc
+ * This is important, if you miss something here like embed, then it doesn't get passed on to theme.inc.
  */
 function field_wistia_field_formatter_info() {
   $formatters =  array(
@@ -167,7 +167,7 @@ function field_wistia_field_formatter_info() {
 }
 
 /**
- * Implements hook_field_formatter_settings_form()
+ * Implements hook_field_formatter_settings_form().
  *
  * Here we'll tell Drupal how to generate the form that collects the options.
  */
@@ -246,9 +246,9 @@ function field_wistia_field_formatter_settings_form($field, $instance, $view_mod
 }
 
 /**
- * Implements hook_field_formatter_settings_summary()
+ * Implements hook_field_formatter_settings_summary().
  *
- * This displays the chosen settings on the 'Manage Display' page
+ * This displays the chosen settings on the 'Manage Display' page.
  */
 function field_wistia_field_formatter_settings_summary($field, $instance, $view_mode) {
   $display = $instance['display'][$view_mode];
@@ -299,18 +299,18 @@ function field_wistia_field_formatter_settings_summary($field, $instance, $view_
 /**
  * Implements hook_field_formatter_view().
  *
- * This is the hook where we actually do the formatting
+ * This is the hook where we actually do the formatting.
  */
 function field_wistia_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
   $element = array();
 
   switch ($display['type']) {
-    // This formatter generates the wistia embed
+    // This formatter generates the wistia embed.
     case 'field_wistia_video':
       foreach ($items as $delta => $item) {
         $element[$delta] = array(
-          //Setting the theme hook name, gets used as THEME_field_wistia_video
-          //To add the actual markup
+          //Setting the theme hook name, gets used as THEME_field_wistia_video.
+          //To add the actual markup.
           '#theme' => 'field_wistia_video',
           '#video_id' => $item['video_id'],
           '#size' => array_key_exists('field_wistia_size', $display['settings']) ? $display['settings']['field_wistia_size'] : NULL,
@@ -354,7 +354,7 @@ function field_wistia_field_widget_info() {
 /**
  * Implements hook_field_widget_form().
  *
- * Shows up on node form as the field widget that is getting filled out
+ * Shows up on node form as the field widget that is getting filled out.
  */
 function field_wistia_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
   $value = isset($items[$delta]['input']) ? $items[$delta]['input'] : '';
@@ -365,11 +365,11 @@ function field_wistia_field_widget_form(&$form, &$form_state, $field, $instance,
     '#size' => 60,
     '#maxlength' => 1024,
     '#element_validate' => array('field_wistia_input_validate'),
-    //'#value_callback' => 'field_wistia_widget_value',
+    // '#value_callback' => 'field_wistia_widget_value',
   );
 
   // Add our own description if one is not provided by the UI.
-  // I.e. somone doens't make their own
+  // I.e. somone doens't make their own.
   if ($element['#description'] == '') {
     $element['#description'] = t('Enter the Wistia URL. Valid URL formats include: http://www.wistia.com/medias/g5pnf59ala');
   }
@@ -387,7 +387,7 @@ function field_wistia_field_widget_form(&$form, &$form_state, $field, $instance,
 }
 
 /**
- * Validation for the Wistia field itself
+ * Validation for the Wistia field itself.
  */
 function field_wistia_input_validate($element, &$form_state, $form) {
   $input = $element['#value'];
@@ -418,10 +418,10 @@ function field_wistia_field_widget_error($element, $error, $form, &$form_state) 
 }
 
 /**
- * Implements hook_theme()
+ * Implements hook_theme().
  *
  * Also important to have all the damn variables in here or they
- * don't get passed to theme
+ * don't get passed to theme.
  */
 function field_wistia_theme($existing, $type, $theme, $path) {
   return array(

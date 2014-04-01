@@ -12,21 +12,21 @@
  */
 
 /**
- * Declare new theme_hook function for wistia videos embeds
+ * Declare new theme_hook function for wistia videos embeds.
  */
 function theme_field_wistia_video($variables) {
   $id = $variables['video_id'];
   $size = $variables['size'];
 
   $height = array_key_exists('height', $variables) ? $variables['height'] : NULL;
-  $width =  array_key_exists('width', $variables) ? $variables['width'] : NULL;
+  $width = array_key_exists('width', $variables) ? $variables['width'] : NULL;
   $embedtype = array_key_exists('embed', $variables) ? $variables['embed'] : FALSE;
   $autoplay = array_key_exists('autoplay', $variables) ? $variables['autoplay'] : FALSE;
   $videofoam = array_key_exists('videofoam', $variables) ? $variables['videofoam'] : FALSE;
   $ssl = array_key_exists('ssl', $variables) ? $variables['ssl'] : FALSE;
   $plugin = array_key_exists('plugin', $variables) ? $variables['plugin'] : FALSE;
 
-  // Query Strings based on settings
+  // Query Strings based on settings.
   $query = array();
   if ($height) {
     $query['height'] = $height;
@@ -54,13 +54,11 @@ function theme_field_wistia_video($variables) {
   $url = FIELD_WISTIA_PUBLIC_EMBED_URL . $id . '?' . http_build_query($query);
 
   $params = array('url' => $url);
-
-  /* This sends the oembed request to wistia and gets a json array in return
-   *
-   * The html key in the array holds renderable markup  
-   */
+ 
+  // This sends the oembed request to wistia and gets a json array in return.
+  // The html key in the array holds renderable markup.
   $embed = _field_wistia_request_embed($params);
-  // Build the oembed URL with options query strings
+  // Build the oembed URL with options query strings.
   $output = $embed['html'];
 
   return $output;
@@ -71,8 +69,10 @@ function theme_field_wistia_video($variables) {
  *
  * Wistia returns a json array via oembed queury where the html key
  * is the renderable element.
- * @param $query array the quiery string to send to the endpoint.
+ *
+ * @param $query array the query string to send to the endpoint.
  * @return array|bool
+ *
  */
 function _field_wistia_request_embed($query) {
   // Make HTTP request.
@@ -84,8 +84,8 @@ function _field_wistia_request_embed($query) {
     return (array)$data;
   }
   else {
-    // Failure. Either the video or playlist doesn't exist on Wistia or there
-    // Was an error with the request.
+    // Failure. Either the video or playlist doesn't exist on Wistia.
+    // Or there was an error with the request.
     return FALSE;
   }
 }
@@ -105,7 +105,7 @@ function theme_field_wistia_thumbnail($variables) {
   $wistia = variable_get('field_wistia_thumb_dir', 'field_wistia');
   $dest = $files . '/' . $wistia . '/' . $id . '.png';
 
-   // Check to see if a thumbnail exists locally.
+  // Check to see if a thumbnail exists locally.
   if (!file_exists($dest)) {
     // Retrieve the image from Wistia.
     if (!field_wistia_get_remote_image($id)) {

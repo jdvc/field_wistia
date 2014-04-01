@@ -12,8 +12,7 @@
  */
 
 /**
- * Decare new theme_hook function for wistia videos embeds
- * why use array_key_exits?
+ * Declare new theme_hook function for wistia videos embeds
  */
 function theme_field_wistia_video($variables) {
   $id = $variables['video_id'];
@@ -51,12 +50,13 @@ function theme_field_wistia_video($variables) {
     $query['plugin']['socialbar-v1']['buttons'] = 'twitter-facebook-reddit';
   }
 
-  /* http_build_query Parses an array into a valid, rawurlencoded query string. */
+  /* Http_build_query Parses an array into a valid, rawurlencoded query string. */
   $url = FIELD_WISTIA_PUBLIC_EMBED_URL . $id . '?' . http_build_query($query);
 
   $params = array('url' => $url);
 
-  /* this sends the oembed request to wistia and gets a json array in return
+  /* This sends the oembed request to wistia and gets a json array in return
+   *
    * The html key in the array holds renderable markup  
    */
   $embed = _field_wistia_request_embed($params);
@@ -68,6 +68,7 @@ function theme_field_wistia_video($variables) {
 
 /**
  * Request to embed code from the wistia get embed endpoint.
+ *
  * Wistia returns a json array via oembed queury where the html key
  * is the renderable element.
  * @param $query array the quiery string to send to the endpoint.
@@ -84,13 +85,13 @@ function _field_wistia_request_embed($query) {
   }
   else {
     // Failure. Either the video or playlist doesn't exist on Wistia or there
-    // was an error with the request.
+    // Was an error with the request.
     return FALSE;
   }
 }
 
 /**
- * Theme function for thumbnails.
+ * Theme function for Wistia thumbnails.
  */
 function theme_field_wistia_thumbnail($variables) {
   $id = $variables['video_id'];

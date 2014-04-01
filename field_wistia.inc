@@ -18,7 +18,7 @@ function field_wistia_size_options() {
 }
 
 /*
- * regex provided from wistia docs to parse their URLs
+ * Regex provided from Wistia docs to parse their URLs
  */
 function field_wistia_get_video_id($input) {
   $patterns = array(

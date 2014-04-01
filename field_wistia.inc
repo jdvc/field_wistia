@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @ file
+ * @file
  * Field Wistia helper functions.
  */
 
@@ -17,11 +17,9 @@ function field_wistia_size_options() {
   );
 }
 
-/* 
- * regex provided from wistia docs to parse
- * their URLs
+/*
+ * regex provided from wistia docs to parse their URLs
  */
-
 function field_wistia_get_video_id($input) {
   $patterns = array(
     '/https?:\/\/(.+)?(wistia\.com|wi\.st)\/(medias|embed)\/(.*)/',
@@ -34,9 +32,8 @@ function field_wistia_get_video_id($input) {
 
       return $video_id;
     }
-  }  
+  }
 }
-
 
 /**
  * Splits height and width when given size, as from field_wistia_size_options.
@@ -70,7 +67,7 @@ function field_wistia_get_remote_image($id = NULL) {
   $params = array('url' => $url);
   $embed = _field_wistia_request_embed($params);
 
-  $src = $embed['thumbnail_url']; 
+  $src = $embed['thumbnail_url'];
 
   // Make the actual request to download the file.
   $image_result = drupal_http_request($src);
@@ -89,5 +86,4 @@ function field_wistia_get_remote_image($id = NULL) {
   file_put_contents($dest, $image_result->data);
 
   return TRUE;
-
 }

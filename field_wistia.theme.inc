@@ -19,7 +19,6 @@ function theme_field_wistia_video($variables) {
   $id = $variables['video_id'];
   $size = $variables['size'];
 
-  $version = '1.0';
   $height = array_key_exists('height', $variables) ? $variables['height'] : NULL;
   $width =  array_key_exists('width', $variables) ? $variables['width'] : NULL;
   $embedtype = array_key_exists('embed', $variables) ? $variables['embed'] : FALSE;

@@ -134,10 +134,11 @@ function field_wistia_field_is_empty($item, $field) {
  * Implements hook_field_formatter_info().
  *
  * This tells Drupal what fields it applies to and what settings are available.
- * This is important, if you miss something here like embed, then it doesn't get passed on to theme.inc.
+ * This is important, if you miss something here like embed, 
+ * then it doesn't get passed on to theme.inc.
  */
 function field_wistia_field_formatter_info() {
-  $formatters =  array(
+  $formatters = array(
     // This formatter displays a wistia video.
     'field_wistia_video' => array(
       'label' => t('Wistia Video'),
@@ -231,7 +232,7 @@ function field_wistia_field_formatter_settings_form($field, $instance, $view_mod
     );
   }
 
-  // Thumbnail type
+  // Thumbnail type.
   if ($display['type'] == 'field_wistia_thumbnail') {
     $element['image_style'] = array(
       '#type' => 'select',
@@ -309,8 +310,8 @@ function field_wistia_field_formatter_view($entity_type, $entity, $field, $insta
     case 'field_wistia_video':
       foreach ($items as $delta => $item) {
         $element[$delta] = array(
-          //Setting the theme hook name, gets used as THEME_field_wistia_video.
-          //To add the actual markup.
+          // Setting the theme hook name, gets used as THEME_field_wistia_video.
+          // To add the actual markup.
           '#theme' => 'field_wistia_video',
           '#video_id' => $item['video_id'],
           '#size' => array_key_exists('field_wistia_size', $display['settings']) ? $display['settings']['field_wistia_size'] : NULL,
@@ -319,7 +320,7 @@ function field_wistia_field_formatter_view($entity_type, $entity, $field, $insta
           '#embed' => array_key_exists('field_wistia_embed', $display['settings']) ? $display['settings']['field_wistia_embed'] : FALSE,
           '#autoplay' => array_key_exists('field_wistia_autoplay', $display['settings']) ? $display['settings']['field_wistia_autoplay'] : FALSE,
           '#videofoam' => array_key_exists('field_wistia_videofoam', $display['settings']) ? $display['settings']['field_wistia_videofoam'] : FALSE,
-          '#ssl' => array_key_exists('field_wistia_ssl', $display['settings']) ? $display['settings']['field_wistia_ssl']: FALSE,
+          '#ssl' => array_key_exists('field_wistia_ssl', $display['settings']) ? $display['settings']['field_wistia_ssl'] : FALSE,
           '#plugin' => array_key_exists('field_wistia_plugin', $display['settings']) ? $display['settings']['field_wistia_plugin'] : FALSE,
         );
       }
@@ -375,10 +376,10 @@ function field_wistia_field_widget_form(&$form, &$form_state, $field, $instance,
   }
   $return = array('input' => $element);
 
-  //This shows up below the field on the node edit page if there is no custom message set.
+  // Shows up below the field on node edit page if no custom message set.
   if (isset($items[$delta]['video_id'])) {
     $video_id_element = array(
-      '#markup' => '<div class="wistia-video-id">' . t('Wistia video ID: ') . $items[$delta]['video_id'] . '</div>',
+      '#markup' => '<div class="wistia-video-id">' . t('Wistia video ID:') . $items[$delta]['video_id'] . '</div>',
     );
     $return['video_id'] = $video_id_element;
   }
@@ -427,7 +428,7 @@ function field_wistia_theme($existing, $type, $theme, $path) {
   return array(
     'field_wistia_video' => array(
       'variables' => array(
-        'video_id' => NULL, 
+        'video_id' => NULL,
         'size' => NULL,
         'width' => NULL,
         'height' => NULL,

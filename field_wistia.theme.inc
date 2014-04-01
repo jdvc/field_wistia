@@ -54,7 +54,7 @@ function theme_field_wistia_video($variables) {
   $url = FIELD_WISTIA_PUBLIC_EMBED_URL . $id . '?' . http_build_query($query);
 
   $params = array('url' => $url);
- 
+
   // This sends the oembed request to wistia and gets a json array in return.
   // The html key in the array holds renderable markup.
   $embed = _field_wistia_request_embed($params);
@@ -71,8 +71,8 @@ function theme_field_wistia_video($variables) {
  * is the renderable element.
  *
  * @param $query array the query string to send to the endpoint.
- * @return array|bool
  *
+ * @return array|bool
  */
 function _field_wistia_request_embed($query) {
   // Make HTTP request.

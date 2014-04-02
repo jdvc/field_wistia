@@ -26,17 +26,16 @@ function theme_field_wistia_video($variables) {
   $videofoam = array_key_exists('videofoam', $variables) ? $variables['videofoam'] : FALSE;
   $ssl = array_key_exists('ssl', $variables) ? $variables['ssl'] : FALSE;
   $plugin = array_key_exists('plugin', $variables) ? $variables['plugin'] : FALSE;
+  $dimensions = field_wistia_get_dimensions($size, $width, $height);
 
-  // Query Strings based on settings.
+  // Form oembed query string based on settings.
   $query = array();
-  if ($height) {
-    $query['height'] = $height;
-  }
-  if ($width) {
-    $query['width'] = $width;
+  if ($dimensions) {
+    $query['height'] = $dimensions['height'];
+    $query['width'] = $dimensions['width'];
   }
   if ($embedtype) {
-    $query['embedType'] = 'api';
+    $query['embedType'] = $embedtype;
   }
   if ($autoplay) {
     $query['autoPlay'] = 'true';
@@ -97,10 +96,6 @@ function _field_wistia_request_embed($query) {
 function theme_field_wistia_thumbnail($variables) {
   $id = $variables['video_id'];
   $style = $variables['image_style'];
-
-  // Get Wistia settings - TODO is needed?
-  $size = variable_get('field_wistia_size', '420x315');
-  $dimensions = field_wistia_get_dimensions($size);
 
   $files = variable_get('file_public_path', conf_path() . '/files');
   $wistia = variable_get('field_wistia_thumb_dir', 'field_wistia');

@@ -72,6 +72,7 @@ function theme_field_wistia_video($variables) {
  *
  * @param $query
  *   Wistia oembed query array.
+ *
  * @return array|bool
  *   Return array via Wistia oembed or false.
  */

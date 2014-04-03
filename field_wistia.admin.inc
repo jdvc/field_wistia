@@ -8,6 +8,9 @@
  * Can be overriden on and individual field basis
  */
 
+/**
+ * Implements hook_settings_form.
+ */
 function field_wistia_settings_form($form) {
   $form = array();
   $form['text'] = array(

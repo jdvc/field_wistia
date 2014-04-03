@@ -70,9 +70,11 @@ function theme_field_wistia_video($variables) {
  * Wistia returns a json array via oembed queury where the html key
  * is the renderable element.
  *
- * @param $query array the query string to send to the endpoint.
+ * @param $query
+ *   Wistia oembed query array
  *
  * @return array|bool
+ *  Return array via Wistia oembed or false.
  */
 function _field_wistia_request_embed($query) {
   // Make HTTP request.

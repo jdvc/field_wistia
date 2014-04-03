@@ -23,7 +23,6 @@ function field_wistia_menu() {
     'page arguments' => array('field_wistia_settings_form'),
     'access arguments' => array('administer field wistia'),
     'file' => 'field_wistia.admin.inc',
-    'file path' => drupal_get_path('module', 'field_wistia'),
     'type' => MENU_NORMAL_ITEM,
   );
 

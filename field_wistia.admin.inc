@@ -12,7 +12,6 @@
  * Implements hook_settings_form().
  */
 function field_wistia_settings_form($form) {
-  $form = array();
   $form['text'] = array(
     '#type' => 'markup',
     '#markup' => '<p>' . t('The following settings will be used as default values 

@@ -9,7 +9,7 @@
  */
 
 /**
- * Implements hook_settings_form.
+ * Implements hook_settings_form().
  */
 function field_wistia_settings_form($form) {
   $form = array();

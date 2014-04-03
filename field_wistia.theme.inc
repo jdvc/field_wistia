@@ -70,11 +70,11 @@ function theme_field_wistia_video($variables) {
  * Wistia returns a json array via oembed queury where the html key
  * is the renderable element.
  *
- * @param $query
+ * @param array
  *   Wistia oembed query array
  *
  * @return array|bool
- *  Return array via Wistia oembed or false.
+ *   Return array via Wistia oembed or false.
  */
 function _field_wistia_request_embed($query) {
   // Make HTTP request.
@@ -83,7 +83,7 @@ function _field_wistia_request_embed($query) {
 
   if ($data = json_decode($result->data)) {
     // Success.
-    return (array)$data;
+    return (array) $data;
   }
   else {
     // Failure. Either the video or playlist doesn't exist on Wistia.

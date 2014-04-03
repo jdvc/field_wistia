@@ -75,7 +75,6 @@ function field_wistia_get_remote_image($id = NULL) {
   // Assure the wistia thumbnail directory exists.
   $files = variable_get('file_public_path', conf_path() . '/files');
   $field_wistia_dir = variable_get('field_wistia_thumb_dir', 'field_wistia');
-  dpm($field_wistia_dir);
   $field_wistia_path = $files . '/' . $field_wistia_dir;
   if (!file_prepare_directory($field_wistia_path, FILE_CREATE_DIRECTORY) && !mkdir($field_wistia_path, 0775, TRUE)) {
     watchdog('field_wistia', 'Failed to create Field Wistia thumbnail directory: %dir', array('%dir' => $field_wistia_path), WATCHDOG_ERROR);

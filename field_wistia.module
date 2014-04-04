@@ -87,8 +87,8 @@ function field_wistia_field_is_empty($item, $field) {
 /**
  * Implements hook_field_formatter_info().
  *
- * This tells Drupal what fields it applies to and what 
- * settings are available. This is important, if you miss 
+ * This tells Drupal what fields it applies to and what
+ * settings are available. This is important, if you miss
  * something like embed, then it doesn't get passed on to theme.inc.
  */
 function field_wistia_field_formatter_info() {

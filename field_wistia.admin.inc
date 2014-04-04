@@ -14,7 +14,7 @@
 function field_wistia_settings_form($form) {
   $form['text'] = array(
     '#type' => 'markup',
-    '#markup' => '<p>' . t('The following settings will be used as default values 
+    '#markup' => '<p>' . t('The following settings will be used as default values
       on all Wistia video fields.  Many of these settings can be overridden
       on a per-field basis.') . '</p>',
   );

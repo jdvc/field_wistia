@@ -333,7 +333,7 @@ function field_wistia_field_widget_form(&$form, &$form_state, $field, $instance,
   // Shows up below the field on node edit page if no custom message set.
   if (isset($items[$delta]['video_id'])) {
     $video_id_element = array(
-      '#markup' => '<div class="wistia-video-id">' . t('Wistia video ID:') . $items[$delta]['video_id'] . '</div>',
+      '#markup' => '<div class="wistia-video-id">' . t('Wistia video ID: @vid', array('@vid' => $items[$delta]['video_id'])) . '</div>',
     );
     $return['video_id'] = $video_id_element;
   }

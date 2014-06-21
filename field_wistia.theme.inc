@@ -51,7 +51,7 @@ function theme_field_wistia_video($variables) {
   }
 
   /* Http_build_query Parses an array into a valid, rawurlencoded query string. */
-  $url = FIELD_WISTIA_PUBLIC_EMBED_URL . $id . '?' . http_build_query($query);
+  $url = url(FIELD_WISTIA_PUBLIC_EMBED_URL . $id, array('query' => $query));
 
   $params = array('url' => $url);
 

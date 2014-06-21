@@ -32,7 +32,7 @@ function field_wistia_settings_form($form) {
     '#type' => 'checkbox',
     '#title' => t('Scale video window to device with VideoFoam'),
     '#default_value' => variable_get('field_wistia_videofoam', TRUE),
-    '#description' => t('<a target=_blank href="@url">VideoFoam Info</a>', array('@url' => url('http://wistia.com/labs/videofoam/'))),
+    '#description' => l(t('VideFoam Info'), 'http://wistia.com/labs/videofoam'),
   );
   $form['field_wistia_autoplay'] = array(
     '#type' => 'checkbox',

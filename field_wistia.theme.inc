@@ -81,7 +81,7 @@ function _field_wistia_request_embed($query) {
   $endpoint = variable_get('field_wistia_getembed_url', FIELD_WISTIA_DEFAULT_GETEMBED_URL);
   $result = drupal_http_request(url($endpoint, array('query' => $query)));
 
-  if ($data = json_decode($result->data)) {
+  if ($data = drupal_json_decode($result->data)) {
     // Success.
     return (array) $data;
   }

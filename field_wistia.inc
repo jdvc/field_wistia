@@ -77,7 +77,7 @@ function field_wistia_get_remote_image($id = NULL) {
     watchdog('field_wistia', 'Failed to create Field Wistia thumbnail directory: %dir', array('%dir' => $field_wistia_path), WATCHDOG_ERROR);
   }
 
-  // Request and Save the file, system_retrieve file does both
+  // Request and Save the file, system_retrieve file does both.
   $dest = $files . '/' . $field_wistia_dir . '/' . $id . '.png';
   system_retrieve_file($src, $dest);
 

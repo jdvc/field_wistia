@@ -2,8 +2,9 @@
 
 /**
  * @file
- * Format a wista id
- * Theme functions for the Wistia field module.
+ * Format a wista id.
+ *
+ * Theme functions for the Wistia field module
  * An associative array containing:
  * - id: The id of the wistia video
  * - size: the dimensions of the video if custom;

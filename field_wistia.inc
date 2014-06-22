@@ -32,6 +32,9 @@ function field_wistia_get_video_id($input) {
 
       return $video_id;
     }
+    else {
+      return FALSE;
+    }
   }
 }
 

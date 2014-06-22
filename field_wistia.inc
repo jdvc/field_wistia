@@ -69,20 +69,17 @@ function field_wistia_get_remote_image($id = NULL) {
 
   $src = $embed['thumbnail_url'];
 
-  // Make the actual request to download the file.
-  $image_result = drupal_http_request($src);
-
   // Assure the wistia thumbnail directory exists.
   $files = variable_get('file_public_path', conf_path() . '/files');
   $field_wistia_dir = variable_get('field_wistia_thumb_dir', 'field_wistia');
   $field_wistia_path = $files . '/' . $field_wistia_dir;
-  if (!file_prepare_directory($field_wistia_path, FILE_CREATE_DIRECTORY) && !mkdir($field_wistia_path, 0775, TRUE)) {
+  if (!file_prepare_directory($field_wistia_path, FILE_CREATE_DIRECTORY | FILE_MODIFY_PERMISSIONS)) {
     watchdog('field_wistia', 'Failed to create Field Wistia thumbnail directory: %dir', array('%dir' => $field_wistia_path), WATCHDOG_ERROR);
   }
 
-  // Save the file.
+  // Request and Save the file, system_retrieve file does both
   $dest = $files . '/' . $field_wistia_dir . '/' . $id . '.png';
-  file_put_contents($dest, $image_result->data);
+  system_retrieve_file($src, $dest);
 
   return TRUE;
 }

@@ -114,6 +114,7 @@ function field_wistia_field_formatter_info() {
       'field types' => array('field_wistia'),
       'settings' => array(
         'image_style' => 'thumbnail',
+        'image_link' => '',
       ),
     ),
   );
@@ -195,6 +196,17 @@ function field_wistia_field_formatter_settings_form($field, $instance, $view_mod
       '#default_value' => $settings['image_style'],
       '#empty_option' => t('None (original image)'),
     );
+
+    $link_types = array(
+      'content' => t('Content'),
+    );
+    $element['image_link'] = array(
+      '#title' => t('Link image to'),
+      '#type' => 'select',
+      '#default_value' => $settings['image_link'],
+      '#empty_option' => t('Nothing'),
+      '#options' => $link_types,
+    );
   }
 
   return $element;
@@ -238,16 +250,28 @@ function field_wistia_field_formatter_settings_summary($field, $instance, $view_
 
   // Summary for the thumbnail style.
   if ($display['type'] == 'field_wistia_thumbnail') {
+    $summary = array();
+
     $image_styles = image_style_options(FALSE);
     // Unset possible 'No defined styles' option.
     unset($image_styles['']);
     if (isset($image_styles[$settings['image_style']])) {
-      $summary = t('Image style: @style', array('@style' => $image_styles[$settings['image_style']]));
+      $summary[] = t('Image style: @style', array('@style' => $image_styles[$settings['image_style']]));
     }
     else {
-      $summary = t('Original image');
+      $summary[] = t('Original image');
     }
-    return $summary;
+
+    $link_types = array(
+      'content' => t('Linked to content'),
+      'file' => t('Linked to file'),
+    );
+    // Display this setting only if image is linked.
+    if (isset($link_types[$settings['image_link']])) {
+      $summary[] = $link_types[$settings['image_link']];
+    }
+
+    return implode('<br />', $summary);
   }
 }
 
@@ -282,11 +306,17 @@ function field_wistia_field_formatter_view($entity_type, $entity, $field, $insta
 
     // This formatter uses an imagecache preset to generate a thumbnail.
     case 'field_wistia_thumbnail':
+      // Check if the formatter involves a link.
+      if ($display['settings']['image_link'] == 'content') {
+        $uri = entity_uri($entity_type, $entity);
+      }
+
       foreach ($items as $delta => $item) {
         $element[$delta] = array(
           '#theme' => 'field_wistia_thumbnail',
           '#video_id' => $item['video_id'],
           '#image_style' => $display['settings']['image_style'],
+          '#path' => isset($uri) ? $uri : '',
         );
       }
       break;
@@ -398,6 +428,7 @@ function field_wistia_theme($existing, $type, $theme, $path) {
       'variables' => array(
         'video_id' => NULL,
         'image_style' => NULL,
+        'path' => NULL,
       ),
       'file' => 'field_wistia.theme.inc',
     ),

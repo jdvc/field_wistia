@@ -123,5 +123,13 @@ function theme_field_wistia_thumbnail($variables) {
     $image = theme('image', array('path' => $path));
   }
 
+  if (isset($variables['path']['path'])) {
+    $path = $variables['path']['path'];
+    $options = isset($variables['path']['options']) ? $variables['path']['options'] : array();
+    // When displaying an image inside a link, the html option must be TRUE.
+    $options['html'] = TRUE;
+    $image = l($image, $path, $options);
+  }
+
   return $image;
 }

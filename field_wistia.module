@@ -54,9 +54,51 @@ function field_wistia_field_info() {
       'description' => t('A video hosted on Wistia.'),
       'default_widget' => 'field_wistia',
       'default_formatter' => 'field_wistia_video',
+      'property_type' => 'wistia',
+      'property_callbacks' => array('wistia_property_info_callback'),
     ),
   );
 }
+
+/**
+ * Callback to alter the property info of wistia fields.
+ *
+ * @see hook_field_info().
+ */
+function wistia_property_info_callback(&$info, $entity_type, $field, $instance, $field_type) {
+  $name = $field['field_name'];
+  $property = &$info[$entity_type]['bundles'][$instance['bundle']]['properties'][$name];
+
+  $property['type'] = ($field['cardinality'] != 1) ? 'list<wistia>' : 'wistia';
+  $property['getter callback'] = 'entity_metadata_field_verbatim_get';
+  $property['setter callback'] = 'entity_metadata_field_verbatim_set';
+  $property['property info'] = wistia_field_data_property_info();
+
+  unset($property['query callback']);
+}
+
+/**
+ * Defines info for the properties of wistia field data.
+ */
+function wistia_field_data_property_info($name = NULL) {
+  return array(
+    'input' => array(
+      'label' => t('Wistia URL'),
+      'description' => t('The absolute URL for the Wistia video.'),
+      'type' => 'text',
+      'getter callback' => 'entity_property_verbatim_get',
+      'setter callback' => 'entity_property_verbatim_set',
+    ),
+    'video_id' => array(
+      'label' => t('Wistia Video ID'),
+      'description' => t('The ID assigned to the wistia video'),
+      'type' => 'text',
+      'getter callback' => 'entity_property_verbatim_get',
+      'setter callback' => 'entity_property_verbatim_set',
+    ),
+  );
+}
+
 
 /**
  * Implements hook_field_validate().

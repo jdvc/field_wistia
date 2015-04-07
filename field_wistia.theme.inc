@@ -79,11 +79,15 @@ function theme_field_wistia_video($variables) {
  */
 function _field_wistia_request_embed($query) {
   // Make HTTP request.
+  dpm($query);
   $endpoint = variable_get('field_wistia_getembed_url', FIELD_WISTIA_DEFAULT_GETEMBED_URL);
   $result = drupal_http_request(url($endpoint, array('query' => $query)));
+  dpm($result);
 
   if ($data = drupal_json_decode($result->data)) {
     // Success.
+    // This returns the html from the json array to render the 
+    // actual video
     return (array) $data;
   }
   else {
@@ -133,3 +137,4 @@ function theme_field_wistia_thumbnail($variables) {
 
   return $image;
 }
+

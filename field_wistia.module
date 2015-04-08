@@ -219,6 +219,7 @@ function field_wistia_field_formatter_settings_form($field, $instance, $view_mod
         'iframe' => t('iFrame'),
         'api' => t('API'),
         'seo' => t('SEO'),
+        'playlist_api' => t('Playlist API'),
       ),
       '#default_value' => $settings['field_wistia_embed'],
     );

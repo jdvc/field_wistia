@@ -55,12 +55,17 @@ function theme_field_wistia_video($variables) {
   $url = url(FIELD_WISTIA_PUBLIC_EMBED_URL . $id, array('query' => $query));
 
   $params = array('url' => $url);
+  dpm($params);
 
   // This sends the oembed request to wistia and gets a json array in return.
   // The html key in the array holds renderable markup.
   $embed = _field_wistia_request_embed($params);
+  //$embed = _field_wistia_request_embed("http://fast.wistia.net/embed/playlists/fwtze94q2f?height=360&width=640&embedType=playlist");
+  //$embed = _field_wistia_request_embed("http://fast.wistia.net/embed/playlists/fwtze94q2f?height=360&width=640&embedType=playlist");
+  $embed = _field_wistia_request_embed("http://fast.wistia.net/embed/playlists/fbe3880a4e?height=360&width=640&embedType=playlist_api");
   // Build the oembed URL with options query strings.
   $output = $embed['html'];
+  dpm($output);
 
   return $output;
 }
@@ -80,6 +85,7 @@ function theme_field_wistia_video($variables) {
 function _field_wistia_request_embed($query) {
   // Make HTTP request.
   dpm($query);
+  
   $endpoint = variable_get('field_wistia_getembed_url', FIELD_WISTIA_DEFAULT_GETEMBED_URL);
   $result = drupal_http_request(url($endpoint, array('query' => $query)));
   dpm($result);

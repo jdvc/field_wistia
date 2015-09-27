@@ -52,7 +52,12 @@ function theme_field_wistia_video($variables) {
   }
 
   /* Http_build_query Parses an array into a valid, rawurlencoded query string. */
-  $url = url(FIELD_WISTIA_PUBLIC_EMBED_URL . $id, array('query' => $query));
+  if ($embedtype == 'playlist_api') {
+    $url = url(FIELD_WISTIA_PUBLIC_EMBED_URL . $id, array('query' => $query));
+  }
+  else {
+    $url = url(FIELD_WISTIA_PLAYLIST_EMBED_URL . $id, array('query' => $query));
+  }
 
   $params = array('url' => $url);
   dpm($params);
@@ -62,7 +67,7 @@ function theme_field_wistia_video($variables) {
   $embed = _field_wistia_request_embed($params);
   //$embed = _field_wistia_request_embed("http://fast.wistia.net/embed/playlists/fwtze94q2f?height=360&width=640&embedType=playlist");
   //$embed = _field_wistia_request_embed("http://fast.wistia.net/embed/playlists/fwtze94q2f?height=360&width=640&embedType=playlist");
-  $embed = _field_wistia_request_embed("http://fast.wistia.net/embed/playlists/fbe3880a4e?height=360&width=640&embedType=playlist_api");
+  //$embed = _field_wistia_request_embed("http://fast.wistia.net/embed/playlists/fbe3880a4e?height=360&width=640&embedType=playlist");
   // Build the oembed URL with options query strings.
   $output = $embed['html'];
   dpm($output);

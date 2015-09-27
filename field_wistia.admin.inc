@@ -48,5 +48,12 @@ function field_wistia_settings_form($form) {
     '#default_value' => variable_get('field_wistia_thumb_dir', 'field_wistia'),
   );
 
+  $form['field_wistia_api_key'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Wistia API Key'),
+    '#description' => t('Wistia API Key'),
+    '#default_value' => variable_get('field_wistia_api_key', 'field_wistia'),
+  );
+
   return system_settings_form($form);
 }

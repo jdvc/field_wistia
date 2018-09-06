@@ -1,4 +1,4 @@
-The Field Wistia module provides a simple field that allows you to add a 
+The Field Wistia module provides a simple field that allows you to add a
 Wistia video to a content type, user, or any entity.
 
 Display types include:
@@ -15,12 +15,12 @@ using Wistia, you already know they're the best!
 Installation
 ------------
 Follow the standard contributed module installation process:
-http://drupal.org/documentation/install/modules-themes/modules-7
+http://drupal.org/documentation/install/modules-themes/modules-8
 
 
 Requirements
 ------------
-All dependencies of this module are enabled by default in Drupal 7.x.
+All dependencies of this module are enabled by default in Drupal 8.x.
 
 
 Use

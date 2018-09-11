@@ -146,6 +146,7 @@ function field_wistia_field_formatter_info() {
         'field_wistia_autoplay' => FALSE,
         'field_wistia_embed' => FALSE,
         'field_wistia_videofoam' => FALSE,
+        'field_wistia_popover' => FALSE,
         'field_wistia_ssl' => FALSE,
         'field_wistia_plugin' => FALSE,
       ),
@@ -212,6 +213,11 @@ function field_wistia_field_formatter_settings_form($field, $instance, $view_mod
       '#title' => t('VideoFoam allows the player to scale with the browser window.'),
       '#default_value' => $settings['field_wistia_videofoam'],
     );
+    $element['field_wistia_popover'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Show the video in a popover'),
+      '#default_value' => $settings['field_wistia_popover'],
+    );
     $element['field_wistia_embed'] = array(
       '#title' => t('Embed Type'),
       '#type' => 'select',
@@ -268,6 +274,7 @@ function field_wistia_field_formatter_settings_summary($field, $instance, $view_
     !empty($settings['field_wistia_embed']) ? $settings['field_wistia_embed'] : FALSE,
     !empty($settings['field_wistia_autoplay']) ? $settings['field_wistia_autoplay'] : FALSE,
     !empty($settings['field_wistia_videofoam']) ? $settings['field_wistia_videofoam'] : FALSE,
+    !empty($settings['field_wistia_popover']) ? $settings['field_wistia_popover'] : FALSE,
     !empty($settings['field_wistia_ssl']) ? $settings['field_wistia_ssl'] : FALSE,
     !empty($settings['field_wistia_plugin']) ? $settings['field_wistia_plugin'] : FALSE,
   );
@@ -340,6 +347,7 @@ function field_wistia_field_formatter_view($entity_type, $entity, $field, $insta
           '#embed' => array_key_exists('field_wistia_embed', $display['settings']) ? $display['settings']['field_wistia_embed'] : FALSE,
           '#autoplay' => array_key_exists('field_wistia_autoplay', $display['settings']) ? $display['settings']['field_wistia_autoplay'] : FALSE,
           '#videofoam' => array_key_exists('field_wistia_videofoam', $display['settings']) ? $display['settings']['field_wistia_videofoam'] : FALSE,
+          '#popover' => array_key_exists('field_wistia_popover', $display['settings']) ? $display['settings']['field_wistia_popover'] : FALSE,
           '#ssl' => array_key_exists('field_wistia_ssl', $display['settings']) ? $display['settings']['field_wistia_ssl'] : FALSE,
           '#plugin' => array_key_exists('field_wistia_plugin', $display['settings']) ? $display['settings']['field_wistia_plugin'] : FALSE,
         );
@@ -462,6 +470,7 @@ function field_wistia_theme($existing, $type, $theme, $path) {
         'plugin' => FALSE,
         'autoplay' => FALSE,
         'videofoam' => FALSE,
+        'popover' => FALSE,
         'ssl' => FALSE,
       ),
       'file' => 'field_wistia.theme.inc',

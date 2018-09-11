@@ -25,6 +25,7 @@ function theme_field_wistia_video($variables) {
   $embedtype = array_key_exists('embed', $variables) ? $variables['embed'] : FALSE;
   $autoplay = array_key_exists('autoplay', $variables) ? $variables['autoplay'] : FALSE;
   $videofoam = array_key_exists('videofoam', $variables) ? $variables['videofoam'] : FALSE;
+  $popover = array_key_exists('popover', $variables) ? $variables['popover'] : FALSE;
   $ssl = array_key_exists('ssl', $variables) ? $variables['ssl'] : FALSE;
   $plugin = array_key_exists('plugin', $variables) ? $variables['plugin'] : FALSE;
   $dimensions = field_wistia_get_dimensions($size, $width, $height);
@@ -43,6 +44,9 @@ function theme_field_wistia_video($variables) {
   }
   if ($videofoam) {
     $query['videoFoam'] = 'true';
+  }
+  if ($popover) {
+    $query['popover'] = 'true';
   }
   if ($ssl) {
     $query['ssl'] = 'true';
@@ -79,7 +83,7 @@ function theme_field_wistia_video($variables) {
  */
 function _field_wistia_request_embed($query) {
   // Make HTTP request.
-  $endpoint = variable_get('field_wistia_getembed_url', FIELD_WISTIA_DEFAULT_GETEMBED_URL);
+  $endpoint = variable_get('field_wistia_getembed_url', FIELD_WISTIA_DEFAULT_OEMBED_URL);
   $result = drupal_http_request(url($endpoint, array('query' => $query)));
 
   if ($data = drupal_json_decode($result->data)) {

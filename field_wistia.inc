@@ -81,7 +81,7 @@ function field_wistia_get_remote_image($id = NULL) {
   }
 
   // Request and Save the file, system_retrieve file does both.
-  $dest = $files . '/' . $field_wistia_dir . '/' . $id . '.png';
+  $dest = $files . '/' . $field_wistia_dir . '/' . $id . '.jpg';
   system_retrieve_file($src, $dest);
 
   return TRUE;

@@ -106,7 +106,7 @@ function theme_field_wistia_thumbnail($variables) {
 
   $files = variable_get('file_public_path', conf_path() . '/files');
   $wistia = variable_get('field_wistia_thumb_dir', 'field_wistia');
-  $dest = $files . '/' . $wistia . '/' . $id . '.png';
+  $dest = $files . '/' . $wistia . '/' . $id . '.jpg';
 
   // Check to see if a thumbnail exists locally.
   if (!file_exists($dest)) {
@@ -119,11 +119,11 @@ function theme_field_wistia_thumbnail($variables) {
   }
 
   if ($style) {
-    $uri = 'public://' . $wistia . '/' . $id . '.png';
+    $uri = 'public://' . $wistia . '/' . $id . '.jpg';
     $image = theme('image_style', array('style_name' => $style, 'path' => $uri));
   }
   else {
-    $path = $files . '/' . $wistia . '/' . $id . '.png';
+    $path = $files . '/' . $wistia . '/' . $id . '.jpg';
     $image = theme('image', array('path' => $path));
   }
 

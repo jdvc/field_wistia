@@ -510,7 +510,7 @@ function field_wista_delete_thumbnail_files($wistia_video_ids) {
   $wistia_thumbnails_dir = variable_get('field_wistia_thumb_dir', 'field_wistia');
 
   foreach ($wistia_video_ids as $wistia_video_id) {
-    $relative_thumbnail_path = $wistia_thumbnails_dir . '/' . $wistia_video_id . '.png';
+    $relative_thumbnail_path = $wistia_thumbnails_dir . '/' . $wistia_video_id . '.jpg';
     image_path_flush($relative_thumbnail_path);
 
     $absolute_thumbnail_path = $files_path . '/' . $relative_thumbnail_path;

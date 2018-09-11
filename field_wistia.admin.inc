@@ -43,7 +43,7 @@ function field_wistia_settings_form($form) {
     '#type' => 'textfield',
     '#title' => t('Wistia Field thumbnail directory'),
     '#field_prefix' => variable_get('file_public_path', conf_path() . '/files') . '/',
-    '#field_suffix' => '/thumbnail.png',
+    '#field_suffix' => '/thumbnail.jpg',
     '#description' => t('Location, within the files directory, where you would like the Wistia thumbnails stored.'),
     '#default_value' => variable_get('field_wistia_thumb_dir', 'field_wistia'),
   );

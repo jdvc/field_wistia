@@ -485,3 +485,72 @@ function field_wistia_theme($existing, $type, $theme, $path) {
     ),
   );
 }
+
+/**
+ * Implements hook_node_update()
+ *
+ * For the node being updated, determine any Wistia videos being used and remove
+ * local video thumbnail files, so that the next request for them, goes to Wistia
+ * and can get new versions, should the thumbnail have changed.
+ */
+function field_wistia_node_update($node) {
+  $wistia_video_ids = field_wistia_get_all_wista_ids_on_node($node);
+  field_wista_delete_thumbnail_files($wistia_video_ids);
+}
+
+
+/**
+ * Deletes wistia video thumbnail files and any derivitives
+ *
+ * @param string[] $wistia_video_ids
+ *   The Wistia ids as found at the end of wistia urls e.g. ..../media/<wistia_id>
+ */
+function field_wista_delete_thumbnail_files($wistia_video_ids) {
+  $files_path = variable_get('file_public_path', conf_path() . '/files');
+  $wistia_thumbnails_dir = variable_get('field_wistia_thumb_dir', 'field_wistia');
+
+  foreach ($wistia_video_ids as $wistia_video_id) {
+    $relative_thumbnail_path = $wistia_thumbnails_dir . '/' . $wistia_video_id . '.png';
+    image_path_flush($relative_thumbnail_path);
+
+    $absolute_thumbnail_path = $files_path . '/' . $relative_thumbnail_path;
+    file_unmanaged_delete($absolute_thumbnail_path);
+  }
+}
+
+/**
+ * Determine all the Wistia video ids references in Wistia fields for the given node.
+ *
+ * @param object $node
+ *   The node for which to determine Wistia ids
+ *
+ * @return string[]
+ *   The Wista ids found for the node.
+ */
+function field_wistia_get_all_wista_ids_on_node($node) {
+  $wistia_video_ids = [];
+
+  $fields_info = field_info_instances('node', $node->type);
+  $wistia_field_names = [];
+  foreach (array_keys($fields_info) as $field_name) {
+    $field_info = field_info_field($field_name);
+    $field_type = $field_info['type'];
+    if ($field_type === 'field_wistia') {
+      $wistia_field_names []= $field_name;
+    }
+  }
+
+  foreach ($wistia_field_names as $wistia_field_name) {
+    // get all the ids used across each value and language for this Wistia field.
+    foreach ($node->$wistia_field_name as $language => $field_values) {
+      foreach ($field_values as $field_value) {
+        if (!empty($field_value['video_id'])) {
+          $wistia_video_ids []= $field_value['video_id'];
+        }
+      }
+    }
+  }
+
+  $wistia_video_ids = array_unique($wistia_video_ids);
+  return $wistia_video_ids;
+}

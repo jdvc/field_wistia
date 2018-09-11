@@ -23,8 +23,8 @@ function field_wistia_settings_form($form) {
     '#type' => 'radios',
     '#options' => array(
       'iframe' => t('iFrame'),
-      'api' => t('API'),
-      'seo' => t('SEO'),
+      'async' => t('Async'),
+      'async_popover' => t('Async Popover'),
     ),
     '#default_value' => variable_get('field_wistia_embed', FALSE),
   );
